@@ -104,10 +104,11 @@ import WalletFundingWrapper from "../components/wallet/WalletFundingWrapper.tsx"
       if (button.title) {
         // Already connected - revalidate
         if (provider) {
-          const { kit } = await import("./stellar-wallets-kit");
-          kit.setWallet(provider);
+          const { getKit } = await import("./stellar-wallets-kit");
+          const walletKit = await getKit();
+          walletKit.setWallet(provider);
           try {
-            const { address } = await kit.getAddress();
+            const { address } = await walletKit.getAddress();
             const currentStored = loadedPublicKey();
 
             if (address !== currentStored) {
@@ -135,12 +136,13 @@ import WalletFundingWrapper from "../components/wallet/WalletFundingWrapper.tsx"
 
       // First connection
       try {
-        const { kit } = await import("./stellar-wallets-kit");
-        await kit.openModal({
+        const { getKit } = await import("./stellar-wallets-kit");
+        const walletKit = await getKit();
+        await walletKit.openModal({
           onWalletSelected: async (option: { id: string }) => {
             try {
-              kit.setWallet(option.id);
-              const { address } = await kit.getAddress();
+              walletKit.setWallet(option.id);
+              const { address } = await walletKit.getAddress();
 
               setConnection(address, option.id);
               await setLoggedIn(address);
@@ -193,8 +195,9 @@ import WalletFundingWrapper from "../components/wallet/WalletFundingWrapper.tsx"
 
     const provider = loadedProvider();
     if (provider) {
-      import("./stellar-wallets-kit").then(({ kit }) => {
-        kit.setWallet(provider);
+      import("./stellar-wallets-kit").then(async ({ getKit }) => {
+        const walletKit = await getKit();
+        walletKit.setWallet(provider);
       });
     }
   });

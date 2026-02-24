@@ -190,8 +190,9 @@ export async function sendXLM(
       .build();
 
     // Sign via wallet kit
-    const { kit } = await import("../components/stellar-wallets-kit");
-    const { signedTxXdr } = await kit.signTransaction(transaction.toXDR());
+    const { getKit } = await import("../components/stellar-wallets-kit");
+    const walletKit = await getKit();
+    const { signedTxXdr } = await walletKit.signTransaction(transaction.toXDR());
 
     // Submit signed transaction directly to Horizon
     const signedTransaction = new StellarSdk.Transaction(
@@ -284,8 +285,9 @@ export async function signAssembledTransaction(
 
   const preparedXdr = assembledTx.toXDR();
 
-  const { kit } = await import("../components/stellar-wallets-kit");
-  const { signedTxXdr } = await kit.signTransaction(preparedXdr);
+  const { getKit } = await import("../components/stellar-wallets-kit");
+  const walletKit = await getKit();
+  const { signedTxXdr } = await walletKit.signTransaction(preparedXdr);
 
   return signedTxXdr;
 }
