@@ -42,23 +42,28 @@ async function initializeKit(): Promise<any> {
   }
 }
 
-function initializeLegacyKit(): any {
+async function initializeLegacyKit(): Promise<any> {
   console.log("[StellarWalletsKit] Initializing LEGACY npm v1.9.5...");
 
-  const {
-    allowAllModules,
-    StellarWalletsKit,
-  } = require("@creit.tech/stellar-wallets-kit");
-  const { LedgerModule } = require("@creit.tech/stellar-wallets-kit/modules/ledger.module");
+  try {
+    const kitModule = await import("@creit.tech/stellar-wallets-kit");
+    const ledgerModule = await import("@creit.tech/stellar-wallets-kit/modules/ledger.module");
+    
+    const { allowAllModules, StellarWalletsKit } = kitModule;
+    const { LedgerModule } = ledgerModule;
 
-  _kitInstance = new StellarWalletsKit({
-    modules: [...allowAllModules(), new LedgerModule()],
-    // @ts-ignore
-    network: import.meta.env.PUBLIC_SOROBAN_NETWORK_PASSPHRASE,
-  });
+    _kitInstance = new StellarWalletsKit({
+      modules: [...allowAllModules(), new LedgerModule()],
+      // @ts-ignore
+      network: import.meta.env.PUBLIC_SOROBAN_NETWORK_PASSPHRASE,
+    });
 
-  console.log("[StellarWalletsKit] ✅ LEGACY npm v1.9.5 initialized");
-  return _kitInstance;
+    console.log("[StellarWalletsKit] ✅ LEGACY npm v1.9.5 initialized");
+    return _kitInstance;
+  } catch (error) {
+    console.error("[StellarWalletsKit] ❌ Failed to initialize legacy version:", error);
+    throw error;
+  }
 }
 
 /**
